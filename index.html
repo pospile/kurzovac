@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Kurzovník</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+        <link rel="stylesheet" href="css/checkbox.css">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <script src="jquery-3.2.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.js"></script>
+
+
+    </head>
+
+    <body>
+
+        <div class="row">
+            <div class="col-3">
+
+                <div style="height: 12vh;">
+
+
+                    <div class="select">
+                        <select id="mena_select">
+
+                        </select>
+                        <div class="select__arrow"></div>
+                    </div>
+
+                    <hr>
+
+                </div>
+
+                <div id="mena_checkbox" style="overflow-y: auto; height: 82vh">
+
+
+
+                </div>
+
+
+
+
+            </div>
+            <div class="col-9">
+                <h2>Kurzovník k: <i id="date">18.1.2018</i></h2>
+                <div id="kurzovnik" class="Rtable Rtable--2cols">
+                    <div class="Rtable-cell">Měna</div>
+                    <div class="Rtable-cell"><span id="multiplyer" contenteditable="true">1</span> <b id="cur_mena"></b> </dv></div>
+
+                    <div id="inner_kurz" class="Rtable Rtable--2cols" style="width:100%;">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="currencies.js"></script>
+        <script>
+
+
+
+            var checkboxes = [];
+            var selected = [];
+            var current_selected;
+            var multiply = 1;
+
+
+            for (var i = 0; i < currencies.length; i++)
+            {
+                $("#mena_select").append("<option>" + currencies[i] + "</option>");
+
+                if(store.get("selected")){
+                    if (store.get("selected").indexOf(currencies[i]) === -1){
+                        $("#mena_checkbox").append('<label class="control control--checkbox">' + currencies[i] + '<input id="' + currencies[i] + '" type="checkbox"/><div class="control__indicator"></div></label>');
+                    }
+                    else {
+                        $("#mena_checkbox").append('<label class="control control--checkbox">' + currencies[i] + '<input id="' + currencies[i] + '" type="checkbox" checked/><div class="control__indicator"></div></label>');
+                        selected = store.get("selected");
+                    }
+                }
+
+                checkboxes.push($("#" + currencies[i]));
+                $("#" + currencies[i]).on("change", function (e) {
+                    console.log(e.currentTarget.id);
+                    if (selected.indexOf(e.currentTarget.id) != -1)
+                    {
+                        selected.splice(selected.indexOf(e.currentTarget.id), 1);
+                        console.log("mazu");
+                    } else
+                    {
+                        selected.push(e.currentTarget.id);
+                        console.log("pridavam");
+                    }
+                    store.set("selected", selected);
+                    ReRender();
+                });
+            }
+            current_selected = $("#mena_select").val();
+            $("#mena_select").on("change", function (e) {
+                console.log(e.currentTarget.value + "pozor měním ale neukládám");
+                current_selected = e.currentTarget.value;
+                store.set("current_selected", current_selected);
+                ReRender();
+            });
+            $("#multiplyer").on("keyup", function () {
+                multiply = parseInt($("#multiplyer").html());
+                console.log(multiply);
+                ReRender();
+            });
+
+
+           
+
+
+            function ReRender(timeout) {
+
+
+                if (store.get("current_selected") !== undefined){
+                    current_selected = store.get("current_selected");
+                    $("#mena_select").val(current_selected);
+                }
+
+                var kurzy = $.get("https://api.fixer.io/latest?base=" + current_selected, function (resp) {
+                    console.log();
+
+                    $("#inner_kurz").html("");
+
+                    for (var i = 0; i < selected.length; i++) {
+                        console.log("prerendruji");
+
+                        $("#inner_kurz").append('<div class="Rtable-cell">' + selected[i] +  ' <small><i>('+DetailsAbout(selected[i]).name+')</i></small></div>');
+                        if (resp.rates[selected[i]] == undefined){
+                            $("#inner_kurz").append('<div class="Rtable-cell">1</div>');
+                        }
+                        else {
+                            $("#inner_kurz").append('<div class="Rtable-cell">' + multiply* resp.rates[selected[i]] + '<small> '+DetailsAbout(selected[i]).symbol+'</small>'   +'</div>');
+                        }
+                    }
+
+                    $("#cur_mena").html("<b>" + current_selected + "</b>");
+                });
+
+            }
+
+            function DetailsAbout(currency) {
+                return codes[currency];
+            }
+
+            ReRender();
+        </script>
+
+    </body>
+
+</html>
