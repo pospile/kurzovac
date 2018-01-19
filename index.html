@@ -12,11 +12,9 @@
         <script src="jquery-3.2.1.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/store.js/1.3.20/store.js"></script>
 
-
     </head>
 
     <body>
-
         <div class="row">
             <div class="col-3">
 
@@ -48,14 +46,17 @@
                 <h2>Kurzovník k: <i id="date">18.1.2018</i></h2>
                 <div id="kurzovnik" class="Rtable Rtable--2cols">
                     <div class="Rtable-cell">Měna</div>
-                    <div class="Rtable-cell"><span id="multiplyer" contenteditable="true">1</span> <b id="cur_mena"></b> </dv></div>
+                    <div class="Rtable-cell"><span id="multiplyer" contenteditable="true" style="background-color: #FFF">1</span> <b id="cur_mena"></b> </dv></div>
 
                     <div id="inner_kurz" class="Rtable Rtable--2cols" style="width:100%;">
 
                     </div>
                 </div>
+
+
             </div>
         </div>
+
 
         <script src="currencies.js"></script>
         <script>
@@ -106,6 +107,9 @@
                 ReRender();
             });
             $("#multiplyer").on("keyup", function () {
+                if ($("#multiplyer").html().length === 0){
+                    $("#multiplyer").html(1);
+                }
                 multiply = parseInt($("#multiplyer").html());
                 console.log(multiply);
                 ReRender();
@@ -124,7 +128,6 @@
                 }
 
                 var kurzy = $.get("https://api.fixer.io/latest?base=" + current_selected, function (resp) {
-                    console.log();
 
                     $("#inner_kurz").html("");
 
