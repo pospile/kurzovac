@@ -58,6 +58,19 @@
         </div>
 
 
+        <div class="drawer" id="drawer">
+            <header class="drawer__header">
+                <h2>Drawer</h2>
+                <div class="close" data-toggle="drawer" onclick="togglePanel();">x</div>
+            </header>
+
+            <div class="drawer__content">
+                <p>Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+        </div>
+
+
+
         <script src="currencies.js"></script>
         <script>
 
@@ -150,6 +163,19 @@
 
             function DetailsAbout(currency) {
                 return codes[currency];
+            }
+
+            var togglePanel = function () {
+                var e = $('#drawer');
+
+                if ( e.hasClass("off" )) {
+                    e.addClass("on").removeClass("off");
+
+                } else if ( e.hasClass("on") ) {
+                    e.addClass("off").removeClass("on");
+                } else {
+                    e.addClass("on");
+                }
             }
 
             ReRender();
